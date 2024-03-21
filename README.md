@@ -21,6 +21,7 @@ MZ146.0599044_1.1096294_all	14:31872935	19200.915810000002	11.15	1.92	185
 
 MZ425.3410787_7.000614_all	14:31875543	19200.941890000002	11.15	1.92	185
 
+
 finalMetaboliteDataPlot14.txt includes six columns: metabolite name (MZ146.0599044_1.1096294_all); polymorphism (14:31850702); -log10 (9.43). All other coulumns are used for plotting results. This file contains only significant markers across across
 all phenotypes.
 
@@ -52,6 +53,7 @@ correlation14Round1.txt, which format is:
 14:19819917 vs 14:7048611 Correlation: 0.21473880191570696; r2: 0.046112753048193234
 
 14:19819917 vs 14:7049308 Correlation: 0.21850732829970657; r2: 0.047745452520675746
+
 
 being 14:19819917 the leading marker for chr 14 selected from the first round of analysis and used to determine correlation values with all other remaining associated polymorphysms present on chromosome 14. the last column respresents the r2 value between
 14:19819917 vs 14:7044818 (second row). 

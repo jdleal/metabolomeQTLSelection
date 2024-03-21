@@ -1,0 +1,224 @@
+package metabolomics;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class getQTLs1R1c {
+	public static void main(String[] args) throws IOException {
+		boolean keepInLoop = true;
+		int round = 1;
+		double r2Threshold = 0.2;
+		while (keepInLoop == true) {
+			String chr = "14"; // >>>>>>>>>>>>>>>>>>>>>>> change chromosome number
+			String path = "E://finalRun//outputGwas//resultFiles//r2PvalPlots3//" + chr;
+			File log5 = new File(path + "//finalMetaboliteDataPlot" + chr + ".txt"); //reads the file
+			FileWriter br5 = new FileWriter(log5, true);
+			BufferedWriter bf5 = new BufferedWriter(br5);
+			BufferedReader bw5 = new BufferedReader(new FileReader 
+					(path + "//finalMetaboliteDataPlot" + chr + ".txt"));
+			String currentLine5 = bw5.readLine();// reads line by line
+			double logOld = 0.00;
+			String marker = "";
+			while(currentLine5 != null) {
+				String[] currentLine5Split = currentLine5.split("\t");
+				double logNew = Double.valueOf(currentLine5Split[3]);
+				if(logOld < logNew) {
+					logOld = logNew;
+					marker = currentLine5Split[1];
+				}
+				currentLine5 = bw5.readLine();// reads line by line
+			}
+			System.out.println(logOld + " " + marker);
+			bw5.close();
+			bf5.close();
+			//***********
+			String markerToLookFor = marker;  // Read user input
+			File log1 = new File(path + "//correlation" + chr + ".txt"); //reads the file
+			FileWriter br1 = new FileWriter(log1, true);
+			BufferedWriter bf1 = new BufferedWriter(br1);
+			BufferedReader bw1 = new BufferedReader(new FileReader 
+					(path + "//vcfLeadingMarkers" + chr + ".txt"));
+			String currentLine1 = bw1.readLine();// reads line by line
+			int[] genotypeTopSnp = null;
+			int[] genotypeSnpToCheck = null;
+			String markerLine = "";
+			while(currentLine1 != null) {
+				if(currentLine1.contains(":")) {
+					//System.out.println(currentLine1);
+					String[] currentLine1Split = currentLine1.split("\t");
+					markerLine = currentLine1Split[2];
+					if(markerToLookFor.equals(markerLine)) {
+						//System.out.println(markerToLookFor + " " + markerLine);
+						String genotpesTopMarker = currentLine1;
+						String[] genotpesTopMarkerSplit = genotpesTopMarker.split("\t");
+						genotypeTopSnp = new int[genotpesTopMarkerSplit.length - 8];    //declaring array
+						genotypeSnpToCheck = new int[genotpesTopMarkerSplit.length - 8];    //declaring array
+						for(int j = 8; j < genotpesTopMarkerSplit.length; j++) {
+							if(genotpesTopMarkerSplit[j].equals("0/0")) {
+								genotypeTopSnp[j - 8] = 0;
+							} else if(genotpesTopMarkerSplit[j].equals("0/1")) {
+								genotypeTopSnp[j - 8] = 1;
+							} else if(genotpesTopMarkerSplit[j].equals("1/1")) {
+								genotypeTopSnp[j - 8] = 2;
+							} else {
+								genotypeSnpToCheck[j - 8] = 0;
+							}
+						}
+						bf1.write(markerLine);//"missing_kidney"
+						bf1.newLine();
+						break;
+					}
+				}
+				currentLine1 = bw1.readLine();// reads line by line
+			}
+			bw1.close();
+			BufferedReader bw2 = new BufferedReader(new FileReader 
+					(path + "//vcfLeadingMarkers" + chr + ".txt"));
+			String currentLine2 = bw2.readLine();// reads line by line
+				while(currentLine2 != null) {
+					if(currentLine2.contains(":")) {
+						String[] currentLine2Split = currentLine2.split("\t");
+						String markerToTest = currentLine2Split[2];
+						for(int j = 8; j < currentLine2Split.length; j++) {
+							if(currentLine2Split[j].equals("0/0")) {
+								genotypeSnpToCheck[j - 8] = 0;
+							} else if(currentLine2Split[j].equals("0/1")) {
+								genotypeSnpToCheck[j - 8] = 1;
+							} else if(currentLine2Split[j].equals("1/1")) {
+								genotypeSnpToCheck[j - 8] = 2;
+							} else {
+								genotypeSnpToCheck[j - 8] = 0;
+							}
+						}
+						double corr = Correlation(genotypeTopSnp, genotypeSnpToCheck);
+						double r2 = corr * corr;
+						bf1.write(markerLine + " vs " + markerToTest + " Correlation: " + corr + "; r2: " + r2);//"missing_kidney"
+						bf1.newLine();
+					}
+					currentLine2 = bw2.readLine();// reads line by line
+				}
+			bw2.close();
+			bf1.close();
+			BufferedReader bw3 = new BufferedReader(new FileReader 
+					(path + "//finalMetaboliteDataPlot" + chr + ".txt"));
+			String currentLine3 = bw3.readLine();// reads line by line
+			while(currentLine3 != null) {
+				String[] currentLine3Split = currentLine3.split("\t");
+				String marker1 = currentLine3Split[1];
+				BufferedReader bw4 = new BufferedReader(new FileReader 
+						(path + "//correlation" + chr + ".txt"));
+				String currentLine4 = bw4.readLine();// reads line by line
+				currentLine4 = bw4.readLine();// reads line by line
+				try {
+					while(currentLine4 != null) {
+						String[] currentLine4Split = currentLine4.split("\s");
+						String marker4 = currentLine4Split[2];
+						//System.out.println(marker1 + " " + marker4);
+						if(marker1.contentEquals(marker4)) {
+							//System.out.println(marker1 + " " + marker4);	
+						}
+						currentLine4 = bw4.readLine();// reads line by line
+					}
+				}catch (Exception e){}
+				currentLine3 = bw3.readLine();// reads line by line
+				bw4.close();
+			}
+			bw3.close();
+			BufferedReader bw4 = new BufferedReader(new FileReader 
+					(path + "//finalMetaboliteDataPlot" + chr + ".txt"));
+			String currentLine4 = bw4.readLine();// reads line by line
+			File log4a = new File(path + "//finalMetaboliteDataPlot" + chr + "_a.txt"); //reads the file
+			FileWriter br4a = new FileWriter(log4a, true);
+			BufferedWriter bf4a = new BufferedWriter(br4a);
+			File log4b = new File(path + "//finalMetaboliteDataPlot" + chr + "_b.txt"); //reads the file
+			FileWriter br4b = new FileWriter(log4b, true);
+			BufferedWriter bf4b = new BufferedWriter(br4b);
+			File log4c = new File(path + "//finalMetaboliteDataPlot" + chr + "_c.txt"); //reads the file
+			FileWriter br4c = new FileWriter(log4c, true);
+			BufferedWriter bf4c = new BufferedWriter(br4c);
+			while(currentLine4 != null) {
+				//System.out.println(currentLine4);
+				String[] currentLine4Split = currentLine4.split("\t");
+				String marker4 = currentLine4Split[1];
+				BufferedReader bw6 = new BufferedReader(new FileReader 
+						(path + "//correlation" + chr + ".txt"));
+				String currentLine6 = bw6.readLine();// reads line by line
+				currentLine6 = bw6.readLine();// reads line by line
+				while(currentLine6 != null) {
+					//System.out.println(currentLine6);
+					String[] currentLine6Split = currentLine6.split("\s");
+					String marker6 = currentLine6Split[2];
+					double r2 = Double.valueOf(currentLine6Split[6]);
+					//System.out.println(marker4 + "\t" + marker6);
+					if(marker4.contentEquals(marker6)) {	
+						//System.out.println(marker4 + "\t" + marker6);		
+						bf4a.write(currentLine4 + "\t" + r2);
+						bf4a.newLine();
+					}if(marker4.contentEquals(marker6) && r2 <= r2Threshold) {	// <<<<<<<<<<<<<<<<<<<<<<<<<<<< change r2
+						//System.out.println(marker4 + "\t" + marker6);		
+						bf4b.write(currentLine4);
+						bf4b.newLine();
+					}if(marker4.contentEquals(marker6) && r2 > r2Threshold) {	// <<<<<<<<<<<<<<<<<<<<<<<<<<<< change r2
+						//System.out.println(marker4 + "\t" + marker6);		
+						bf4c.write(currentLine4 + "\t" + r2);
+						bf4c.newLine();
+					}
+					currentLine6 = bw6.readLine();// reads line by line
+				}
+				bw6.close();
+				currentLine4 = bw4.readLine();// reads line by line
+			}
+			bf4a.close();
+			bf4b.close();
+			bf4c.close();
+			bw4.close();
+			File oldName = new File(path + "/finalMetaboliteDataPlot" + chr + "_a.txt");
+			File newName = new File(path + "/finalMetaboliteDataPlot" + chr + "_aRound" + round + ".txt");
+			oldName.renameTo(newName);
+			oldName = new File(path + "/finalMetaboliteDataPlot" + chr + ".txt");
+			newName = new File(path + "/finalMetaboliteDataPlot" + chr + "Round" + round + ".txt");		      
+			oldName.renameTo(newName);
+			oldName = new File(path + "/finalMetaboliteDataPlot" + chr + "_b.txt");
+			newName = new File(path + "/finalMetaboliteDataPlot" + chr + ".txt");
+			if(oldName.renameTo(newName)) {
+				keepInLoop = true;
+			} else {
+				keepInLoop = false;
+			}
+			oldName = new File(path + "/finalMetaboliteDataPlot" + chr + "_c.txt");
+			newName = new File(path + "/finalMetaboliteDataPlot" + chr + "_cRound" + round + ".txt");
+			oldName.renameTo(newName);
+			oldName = new File(path + "/correlation" + chr + ".txt");
+			newName = new File(path + "/correlation" + chr + "Round" + round + ".txt");	
+			oldName.renameTo(newName);
+			round++;
+		}
+	}
+	public static double Correlation(int[] xs, int[] ys) {
+		//TODO: check here that arrays are not null, of the same length etc
+		double sx = 0.0;
+		double sy = 0.0;
+		double sxx = 0.0;
+		double syy = 0.0;
+		double sxy = 0.0;
+		int n = xs.length;
+		for(int i = 0; i < n; ++i) {
+			double x = xs[i];
+			double y = ys[i];
+			sx += x;
+			sy += y;
+			sxx += x * x;
+			syy += y * y;
+			sxy += x * y;
+		}
+		double cov = sxy / n - sx * sy / n / n; // covariation
+		double sigmax = Math.sqrt(sxx / n -  sx * sx / n / n); // standard error of x
+		double sigmay = Math.sqrt(syy / n -  sy * sy / n / n); // standard error of y
+		return cov / sigmax / sigmay; // correlation is just a normalized covariation
+	}
+	//***********
+}

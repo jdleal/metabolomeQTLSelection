@@ -59,7 +59,7 @@ being 14:19819917 the leading marker for chr 14 selected from the first round of
 14:19819917 vs 14:7044818 (second row). 
 
 From the first round of analysis, three files are created from finalMetaboliteDataPlot14.txt. 1) finalMetaboliteDataPlot14_aRound1, which includes the same information from finalMetaboliteDataPlot14.txt plus r2 value with the leading marker from the first round. 
-2) finalMetaboliteDataPlot14_bRound1, ehich includes all markers from finalMetaboliteDataPlot14_aRound1 with r2 lower than the threshold and 3) finalMetaboliteDataPlot14_cRound1, which includes all markers from finalMetaboliteDataPlot14.txt which r2 values
+2) finalMetaboliteDataPlot14_bRound1, which includes all markers from finalMetaboliteDataPlot14_aRound1 with r2 lower than the threshold and 3) finalMetaboliteDataPlot14_cRound1, which includes all markers from finalMetaboliteDataPlot14.txt which r2 values
 were higher than the r2 theshold. finalMetaboliteDataPlot14_bRound1 is then relabled as finalMetaboliteDataPlot14.txt and made available for the next round of analysis. finalMetaboliteDataPlot14_c files will include all markers belonging to each associated
 loci. Therefore final selected QTLs will be defined by the most downstream and upstream markers and can overlap based on location of the boundries of each loci by round.
 
